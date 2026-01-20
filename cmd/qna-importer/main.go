@@ -30,6 +30,7 @@ func main() {
 	slog.Info(
 		"starting up",
 		"has-discord-token", *discordToken != "",
+		"has-discord-webhook-url", *discordWebhookURL != "",
 		"discourse-url", *discourseURL,
 		"discourse-tag-url", *discourseTagURL,
 		"openai-api-base", *openAIAPIBase,
