@@ -22,6 +22,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/openai/openai-go/v3 v3.16.0
 	github.com/prometheus/client_golang v1.23.2
+	github.com/tigrisdata/storage-go v0.2.0
 )
 
 require (
@@ -97,7 +98,6 @@ require (
 	golang.org/x/telemetry v0.0.0-20260109210033-bd525da824e2 // indirect
 	golang.org/x/text v0.33.0 // indirect
 	golang.org/x/tools v0.41.0 // indirect
-	golang.org/x/tools/go/expect v0.1.1-deprecated // indirect
 	google.golang.org/protobuf v1.36.8 // indirect
 	honnef.co/go/tools v0.6.1 // indirect
 )

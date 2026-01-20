@@ -8,23 +8,19 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"image"
-	_ "image/jpeg"
-	_ "image/png"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"net/url"
 
+	_ "image/jpeg"
+	_ "image/png"
+
 	"github.com/gen2brain/avif"
 	"github.com/gen2brain/webp"
 	"github.com/tigrisdata-community/glue/web"
-)
-
-var (
-	sdServerURL = flag.String("sdcpp-server-url", "http://localhost:1234", "URL for the stable-diffusion.cpp API used with the default client")
 )
 
 func buildURL(base, path string) (*url.URL, error) {
@@ -66,7 +62,7 @@ type ImageData struct {
 
 // ImageGenerationResponse is the response from POST /v1/images/generations.
 type ImageGenerationResponse struct {
-	Created      string      `json:"created"`
+	Created      int         `json:"created"`
 	Data         []ImageData `json:"data"`
 	OutputFormat string      `json:"output_format"`
 }
@@ -84,28 +80,6 @@ type ImageEditRequest struct {
 
 // ImageEditResponse is the response from POST /v1/images/edits.
 type ImageEditResponse = ImageGenerationResponse
-
-var (
-	Default *Client = &Client{
-		HTTP:      http.DefaultClient,
-		APIServer: *sdServerURL,
-	}
-)
-
-// Generate sends an image generation request using the default client.
-func Generate(ctx context.Context, req ImageGenerationRequest) (*ImageGenerationResponse, error) {
-	return Default.Generate(ctx, req)
-}
-
-// ListModels lists available models using the default client.
-func ListModels(ctx context.Context) (*ModelsResponse, error) {
-	return Default.ListModels(ctx)
-}
-
-// Edit sends an image edit request using the default client.
-func Edit(ctx context.Context, req ImageEditRequest) (*ImageEditResponse, error) {
-	return Default.Edit(ctx, req)
-}
 
 type Client struct {
 	HTTP      *http.Client

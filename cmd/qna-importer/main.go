@@ -51,7 +51,7 @@ func main() {
 			log.Fatal("error:", err)
 		}
 
-	case "discord-import-discord":
+	case "discourse-import-discord":
 		if err := discourseImportDiscord(ctx); err != nil {
 			log.Fatal("error:", err)
 		}

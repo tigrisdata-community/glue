@@ -14,7 +14,9 @@ import (
 	"github.com/tigrisdata-community/glue/internal/store"
 	"github.com/tigrisdata-community/glue/web"
 	"github.com/tigrisdata-community/glue/web/discordwebhook"
+	"github.com/tigrisdata-community/glue/web/sdcpp"
 	"github.com/tigrisdata-community/glue/web/useragent"
+	"github.com/tigrisdata/storage-go"
 )
 
 var (
@@ -22,6 +24,7 @@ var (
 	discordGuild        = flag.String("discord-guild", "1457741299041046581", "Discord guild to operate in")
 	discordToken        = flag.String("discord-token", "", "Discord bot token")
 	discordWebhookURL   = flag.String("discord-webhook-url", "", "Discord webhook URL")
+	sdcppURL            = flag.String("sdcpp-url", "", "stable-diffusion.cpp server URL")
 )
 
 func discourseImportDiscord(ctx context.Context) error {
@@ -35,10 +38,24 @@ func discourseImportDiscord(ctx context.Context) error {
 		Prefix:     "discourse-thread",
 	}
 
-	ug := &UsernameGenerator{
-		Storage: store.JSON[string]{
+	tigris, err := storage.New(ctx)
+	if err != nil {
+		return err
+	}
+
+	ug := &UserGenerator{
+		Storage: store.JSON[FakeUser]{
 			Underlying: st,
 			Prefix:     "discord-generated-usernames",
+		},
+		AvatarGen: &AvatarGen{
+			sd: &sdcpp.Client{
+				HTTP:      http.DefaultClient,
+				APIServer: *sdcppURL,
+			},
+			tigris: tigris,
+			bucket: *storeBucket,
+			prefix: "avatars",
 		},
 	}
 
@@ -57,8 +74,6 @@ func discourseImportDiscord(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("can't list discourse threads: %w", err)
 	}
-
-	threads = []string{threads[0]}
 
 	u, err := url.Parse(*discordWebhookURL)
 	if err != nil {
@@ -110,10 +125,18 @@ func discourseImportDiscord(ctx context.Context) error {
 				continue
 			}
 
-			req := discordwebhook.Send(whurl, discordwebhook.Webhook{
+			user := ug.Get(ctx, post.UserID)
+			wh := discordwebhook.Webhook{
 				Content:  post.Body,
-				Username: ug.Get(ctx, post.UserID),
-			})
+				Username: user.Username,
+			}
+			slog.Info("got user", "user", user)
+
+			if user.AvatarKey != "" {
+				wh.AvatarURL = fmt.Sprintf("https://%s.t3.storage.dev/%s", *storeBucket, user.AvatarKey)
+			}
+
+			req := discordwebhook.Send(whurl, wh)
 			req.Header.Set("User-Agent", useragent.Generate("tigris-gtm-glue", "https://tigrisdata.com"))
 			resp, err := http.DefaultClient.Do(req)
 			if err != nil {
@@ -132,18 +155,36 @@ func discourseImportDiscord(ctx context.Context) error {
 	return nil
 }
 
-type UsernameGenerator struct {
-	Storage store.JSON[string]
+type UserGenerator struct {
+	Storage   store.JSON[FakeUser]
+	AvatarGen *AvatarGen
 }
 
-func (ug *UsernameGenerator) Get(ctx context.Context, key string) string {
+func (ug *UserGenerator) Get(ctx context.Context, key string) FakeUser {
 	result, err := ug.Storage.Get(ctx, key)
 	if err != nil {
 		slog.Debug("got error fetching username", "key", key, "err", err)
 
-		result = faker.Name()
+		result = FakeUser{
+			ActualUID: key,
+			Username:  faker.Name(),
+		}
+
+		avatarKey, err := ug.AvatarGen.GenerateAndUpload(ctx, key)
+		if err != nil {
+			slog.Error("can't render and upload avatar", "err", err)
+		} else {
+			result.AvatarKey = avatarKey
+		}
+
 		ug.Storage.Set(ctx, key, result)
 	}
 
 	return result
+}
+
+type FakeUser struct {
+	ActualUID string `json:"actual_uid"`
+	Username  string `json:"username"`
+	AvatarKey string `json:"avatar_url"`
 }
