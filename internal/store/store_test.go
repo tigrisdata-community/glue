@@ -3,18 +3,8 @@ package store
 import (
 	"context"
 	"errors"
-	"os"
 	"testing"
 )
-
-func skipIfNoCreds(t *testing.T) {
-	t.Helper()
-	if os.Getenv("AWS_ACCESS_KEY_ID") == "" ||
-		os.Getenv("AWS_SECRET_ACCESS_KEY") == "" ||
-		os.Getenv("AWS_REGION") == "" {
-		t.Skip("skipping: AWS credentials not set")
-	}
-}
 
 // mockStore is an in-memory implementation for testing.
 type mockStore struct {
@@ -64,10 +54,10 @@ func (m *mockStore) List(ctx context.Context, prefix string) ([]string, error) {
 
 func TestInterface_Exists(t *testing.T) {
 	tests := []struct {
-		name    string
-		setup   func(*mockStore)
-		key     string
-		wantErr error
+		name     string
+		setup    func(*mockStore)
+		key      string
+		wantErr  error
 		errCheck func(error) bool
 	}{
 		{
@@ -132,11 +122,11 @@ func TestInterface_Exists(t *testing.T) {
 
 func TestJSON_Exists(t *testing.T) {
 	tests := []struct {
-		name    string
-		prefix  string
-		setup   func(*mockStore)
-		key     string
-		wantErr error
+		name     string
+		prefix   string
+		setup    func(*mockStore)
+		key      string
+		wantErr  error
 		errCheck func(error) bool
 	}{
 		{
@@ -149,10 +139,10 @@ func TestJSON_Exists(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name:   "returns ErrNotFound when key does not exist with prefix",
-			setup:  func(m *mockStore) {},
-			prefix: "testprefix",
-			key:    "mykey",
+			name:    "returns ErrNotFound when key does not exist with prefix",
+			setup:   func(m *mockStore) {},
+			prefix:  "testprefix",
+			key:     "mykey",
 			wantErr: ErrNotFound,
 			errCheck: func(err error) bool {
 				return errors.Is(err, ErrNotFound)
@@ -181,8 +171,8 @@ func TestJSON_Exists(t *testing.T) {
 			setup: func(m *mockStore) {
 				m.data["otherprefix/mykey"] = []byte(`{"value":"data"}`)
 			},
-			prefix: "testprefix",
-			key:    "mykey",
+			prefix:  "testprefix",
+			key:     "mykey",
 			wantErr: ErrNotFound,
 			errCheck: func(err error) bool {
 				return errors.Is(err, ErrNotFound)
@@ -269,11 +259,11 @@ func TestInterface_Delete(t *testing.T) {
 
 func TestInterface_Get(t *testing.T) {
 	tests := []struct {
-		name    string
-		setup   func(*mockStore)
-		key     string
-		want    []byte
-		wantErr error
+		name     string
+		setup    func(*mockStore)
+		key      string
+		want     []byte
+		wantErr  error
 		errCheck func(error) bool
 	}{
 		{
@@ -353,10 +343,10 @@ func TestInterface_Set(t *testing.T) {
 		verify  func(*testing.T, *mockStore)
 	}{
 		{
-			name:  "sets new key",
-			key:   "new-key",
-			value: []byte("new-value"),
-			setup: func(m *mockStore) {},
+			name:    "sets new key",
+			key:     "new-key",
+			value:   []byte("new-value"),
+			setup:   func(m *mockStore) {},
 			wantErr: nil,
 			verify: func(t *testing.T, m *mockStore) {
 				got, ok := m.data["new-key"]
@@ -384,10 +374,10 @@ func TestInterface_Set(t *testing.T) {
 			},
 		},
 		{
-			name:  "sets empty key",
-			key:   "",
-			value: []byte("empty-key-value"),
-			setup: func(m *mockStore) {},
+			name:    "sets empty key",
+			key:     "",
+			value:   []byte("empty-key-value"),
+			setup:   func(m *mockStore) {},
 			wantErr: nil,
 			verify: func(t *testing.T, m *mockStore) {
 				got, ok := m.data[""]
@@ -400,10 +390,10 @@ func TestInterface_Set(t *testing.T) {
 			},
 		},
 		{
-			name:  "sets empty value",
-			key:   "empty-value-key",
-			value: []byte{},
-			setup: func(m *mockStore) {},
+			name:    "sets empty value",
+			key:     "empty-value-key",
+			value:   []byte{},
+			setup:   func(m *mockStore) {},
 			wantErr: nil,
 			verify: func(t *testing.T, m *mockStore) {
 				got, ok := m.data["empty-value-key"]
@@ -416,10 +406,10 @@ func TestInterface_Set(t *testing.T) {
 			},
 		},
 		{
-			name:  "sets binary data",
-			key:   "binary-key",
-			value: []byte{0x00, 0x01, 0x02, 0xff, 0xfe, 0xfd},
-			setup: func(m *mockStore) {},
+			name:    "sets binary data",
+			key:     "binary-key",
+			value:   []byte{0x00, 0x01, 0x02, 0xff, 0xfe, 0xfd},
+			setup:   func(m *mockStore) {},
 			wantErr: nil,
 			verify: func(t *testing.T, m *mockStore) {
 				got := m.data["binary-key"]
@@ -534,12 +524,12 @@ func TestJSON_Get(t *testing.T) {
 	}
 
 	tests := []struct {
-		name    string
-		prefix  string
-		setup   func(*mockStore)
-		key     string
-		want    testStruct
-		wantErr error
+		name     string
+		prefix   string
+		setup    func(*mockStore)
+		key      string
+		want     testStruct
+		wantErr  error
 		errCheck func(error) bool
 	}{
 		{
@@ -644,11 +634,11 @@ func TestJSON_Set(t *testing.T) {
 		verify  func(*testing.T, *mockStore)
 	}{
 		{
-			name:   "sets struct with prefix",
-			prefix: "testprefix",
-			key:    "mykey",
-			value:  testStruct{Name: "test", Value: 42},
-			setup:  func(m *mockStore) {},
+			name:    "sets struct with prefix",
+			prefix:  "testprefix",
+			key:     "mykey",
+			value:   testStruct{Name: "test", Value: 42},
+			setup:   func(m *mockStore) {},
 			wantErr: nil,
 			verify: func(t *testing.T, m *mockStore) {
 				got, ok := m.data["testprefix/mykey"]
@@ -662,11 +652,11 @@ func TestJSON_Set(t *testing.T) {
 			},
 		},
 		{
-			name:   "sets struct without prefix",
-			prefix: "",
-			key:    "mykey",
-			value:  testStruct{Name: "noprefix", Value: 99},
-			setup:  func(m *mockStore) {},
+			name:    "sets struct without prefix",
+			prefix:  "",
+			key:     "mykey",
+			value:   testStruct{Name: "noprefix", Value: 99},
+			setup:   func(m *mockStore) {},
 			wantErr: nil,
 			verify: func(t *testing.T, m *mockStore) {
 				got, ok := m.data["mykey"]
@@ -680,11 +670,11 @@ func TestJSON_Set(t *testing.T) {
 			},
 		},
 		{
-			name:   "sets empty struct",
-			prefix: "testprefix",
-			key:    "empty",
-			value:  testStruct{},
-			setup:  func(m *mockStore) {},
+			name:    "sets empty struct",
+			prefix:  "testprefix",
+			key:     "empty",
+			value:   testStruct{},
+			setup:   func(m *mockStore) {},
 			wantErr: nil,
 			verify: func(t *testing.T, m *mockStore) {
 				got, ok := m.data["testprefix/empty"]
@@ -744,10 +734,10 @@ func TestJSON_Delete(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name:   "deleting non-existent key with prefix is no-op",
-			setup:  func(m *mockStore) {},
-			prefix: "testprefix",
-			key:    "nonexistent",
+			name:    "deleting non-existent key with prefix is no-op",
+			setup:   func(m *mockStore) {},
+			prefix:  "testprefix",
+			key:     "nonexistent",
 			wantErr: nil,
 		},
 		{

@@ -21,7 +21,6 @@ import (
 
 var (
 	discordForumChannel = flag.String("discord-forum-channel", "1457749835871686737", "Discord forum channel to operate in")
-	discordGuild        = flag.String("discord-guild", "1457741299041046581", "Discord guild to operate in")
 	discordToken        = flag.String("discord-token", "", "Discord bot token")
 	discordWebhookURL   = flag.String("discord-webhook-url", "", "Discord webhook URL")
 	sdcppURL            = flag.String("sdcpp-url", "", "stable-diffusion.cpp server URL")
