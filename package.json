@@ -1,0 +1,63 @@
+{
+  "name": "@tigrisdata/glue",
+  "version": "0.1.0",
+  "description": "Various bits of glue code",
+  "license": "MIT",
+  "author": "Tigris Data",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "go test ./...",
+    "format": "go tool goimports -w . && prettier -w .",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.3.1",
+    "@commitlint/config-conventional": "^20.3.1",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^12.0.2",
+    "@semantic-release/release-notes-generator": "^14.1.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.7.4"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ],
+    "rules": {
+      "body-max-line-length": [
+        2,
+        "always",
+        99999
+      ],
+      "footer-max-line-length": [
+        2,
+        "always",
+        99999
+      ],
+      "signed-off-by": [
+        2,
+        "always",
+        "Signed-off-by:"
+      ]
+    }
+  },
+  "lint-staged": {
+    "**/*.{js,ts,html,json,css,scss,md,mdx}": [
+      "prettier -w"
+    ],
+    "**/*.go": [
+      "go tool goimports -w"
+    ]
+  },
+  "prettier": {
+    "singleQuote": false,
+    "tabWidth": 2,
+    "semi": true,
+    "trailingComma": "all",
+    "printWidth": 80
+  }
+}
