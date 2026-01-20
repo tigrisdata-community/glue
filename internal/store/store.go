@@ -42,6 +42,9 @@ type Interface interface {
 	// Delete removes a value from the store by key.
 	Delete(ctx context.Context, key string) error
 
+	// Exists returns nil if the key exists, ErrNotFound if it does not exist.
+	Exists(ctx context.Context, key string) error
+
 	// Get returns the value of a key assuming that value exists and has not expired.
 	Get(ctx context.Context, key string) ([]byte, error)
 
@@ -65,6 +68,14 @@ func (j *JSON[T]) Delete(ctx context.Context, key string) error {
 	}
 
 	return j.Underlying.Delete(ctx, key)
+}
+
+func (j *JSON[T]) Exists(ctx context.Context, key string) error {
+	if j.Prefix != "" {
+		key = j.Prefix + "/" + key
+	}
+
+	return j.Underlying.Exists(ctx, key)
 }
 
 func (j *JSON[T]) Get(ctx context.Context, key string) (T, error) {

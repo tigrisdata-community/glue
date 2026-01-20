@@ -45,6 +45,15 @@ func (s *S3API) Delete(ctx context.Context, key string) error {
 	return nil
 }
 
+func (s *S3API) Exists(ctx context.Context, key string) error {
+	_, err := s.s3.HeadObject(ctx, &s3.HeadObjectInput{Bucket: &s.bucket, Key: &key})
+	iopsMetrics.WithLabelValues("s3api", "HeadObject")
+	if err != nil {
+		return fmt.Errorf("%w: %w", ErrNotFound, err)
+	}
+	return nil
+}
+
 func (s *S3API) Get(ctx context.Context, key string) ([]byte, error) {
 	out, err := s.s3.GetObject(ctx, &s3.GetObjectInput{
 		Bucket: &s.bucket,
