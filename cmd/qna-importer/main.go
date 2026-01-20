@@ -41,8 +41,8 @@ func main() {
 	)
 
 	switch flag.Arg(0) {
-	case "discourse-import":
-		if err := discourseImport(ctx); err != nil {
+	case "discourse-scrape":
+		if err := discourseScrape(ctx); err != nil {
 			log.Fatal("error:", err)
 		}
 
@@ -51,8 +51,8 @@ func main() {
 			log.Fatal("error:", err)
 		}
 
-	case "discord-import":
-		if err := discordImport(ctx); err != nil {
+	case "discord-import-discord":
+		if err := discourseImportDiscord(ctx); err != nil {
 			log.Fatal("error:", err)
 		}
 

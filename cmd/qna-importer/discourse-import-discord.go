@@ -24,7 +24,7 @@ var (
 	discordWebhookURL   = flag.String("discord-webhook-url", "", "Discord webhook URL")
 )
 
-func discordImport(ctx context.Context) error {
+func discourseImportDiscord(ctx context.Context) error {
 	st, err := store.NewS3API(ctx, *storeBucket)
 	if err != nil {
 		return err

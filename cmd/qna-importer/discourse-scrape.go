@@ -8,7 +8,7 @@ import (
 	"github.com/tigrisdata-community/glue/web/discourse"
 )
 
-func discourseImport(ctx context.Context) error {
+func discourseScrape(ctx context.Context) error {
 	st, err := store.NewS3API(ctx, *storeBucket)
 	if err != nil {
 		return err
