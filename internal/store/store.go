@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -102,5 +103,17 @@ func (j *JSON[T]) Set(ctx context.Context, key string, value T) error {
 }
 
 func (j *JSON[T]) List(ctx context.Context, prefix string) ([]string, error) {
-	return j.Underlying.List(ctx, j.Prefix+"/"+prefix)
+	fullPrefix := j.Prefix + "/" + prefix
+	keys, err := j.Underlying.List(ctx, fullPrefix)
+	if err != nil {
+		return nil, err
+	}
+
+	// Strip the full prefix from each key.
+	result := make([]string, 0, len(keys))
+	for _, k := range keys {
+		result = append(result, strings.TrimPrefix(k, fullPrefix))
+	}
+
+	return result, nil
 }
