@@ -37,6 +37,7 @@ func main() {
 		"has-openai-api-key", *openAIAPIKey != "",
 		"openai-model", *openAIModel,
 		"store-bucket", *storeBucket,
+		"post-delay", (*postDelay).String(),
 		"args", flag.Args(),
 	)
 
