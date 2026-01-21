@@ -15,6 +15,7 @@ type Webhook struct {
 	Username        string              `json:"username,omitempty"`
 	AvatarURL       string              `json:"avatar_url"`
 	Embeds          []Embeds            `json:"embeds,omitempty"`
+	ThreadName      string              `json:"thread_name,omitempty"`
 	AllowedMentions map[string][]string `json:"allowed_mentions"`
 }
 

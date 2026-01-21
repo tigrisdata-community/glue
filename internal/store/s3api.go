@@ -9,10 +9,13 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/smithy-go/logging"
 )
 
 func NewS3API(ctx context.Context, bucket string) (Interface, error) {
-	cfg, err := awsConfig.LoadDefaultConfig(ctx)
+	cfg, err := awsConfig.LoadDefaultConfig(ctx,
+		awsConfig.WithLogger(logging.Nop{}),
+	)
 	if err != nil {
 		return nil, fmt.Errorf("can't load AWS config from environment: %w", err)
 	}
@@ -42,6 +45,15 @@ func (s *S3API) Delete(ctx context.Context, key string) error {
 		return fmt.Errorf("can't delete from s3: %w", err)
 	}
 	iopsMetrics.WithLabelValues("s3api", "DeleteObject")
+	return nil
+}
+
+func (s *S3API) Exists(ctx context.Context, key string) error {
+	_, err := s.s3.HeadObject(ctx, &s3.HeadObjectInput{Bucket: &s.bucket, Key: &key})
+	iopsMetrics.WithLabelValues("s3api", "HeadObject")
+	if err != nil {
+		return fmt.Errorf("%w: %w", ErrNotFound, err)
+	}
 	return nil
 }
 
