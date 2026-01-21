@@ -20,10 +20,9 @@ import (
 )
 
 var (
-	discordForumChannel = flag.String("discord-forum-channel", "1457749835871686737", "Discord forum channel to operate in")
-	discordToken        = flag.String("discord-token", "", "Discord bot token")
-	discordWebhookURL   = flag.String("discord-webhook-url", "", "Discord webhook URL")
-	sdcppURL            = flag.String("sdcpp-url", "", "stable-diffusion.cpp server URL")
+	discordToken      = flag.String("discord-token", "", "Discord bot token")
+	discordWebhookURL = flag.String("discord-webhook-url", "", "Discord webhook URL")
+	sdcppURL          = flag.String("sdcpp-url", "", "stable-diffusion.cpp server URL")
 
 	postDelay = flag.Duration("post-delay", 5*time.Second, "delay between post creation attempts")
 )
@@ -42,7 +41,7 @@ func discourseImportDiscord(ctx context.Context) error {
 	// discourse key -> discord channel ID
 	discourseToDiscord := store.JSON[string]{
 		Underlying: st,
-		Prefix:     "discord-thread-mapping-dev",
+		Prefix:     "discord-thread-mapping",
 	}
 
 	tigris, err := storage.New(ctx)
