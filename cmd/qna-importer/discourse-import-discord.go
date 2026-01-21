@@ -8,11 +8,11 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/go-faker/faker/v4"
 	"github.com/tigrisdata-community/glue/internal/store"
-	"github.com/tigrisdata-community/glue/web"
 	"github.com/tigrisdata-community/glue/web/discordwebhook"
 	"github.com/tigrisdata-community/glue/web/sdcpp"
 	"github.com/tigrisdata-community/glue/web/useragent"
@@ -24,6 +24,8 @@ var (
 	discordToken        = flag.String("discord-token", "", "Discord bot token")
 	discordWebhookURL   = flag.String("discord-webhook-url", "", "Discord webhook URL")
 	sdcppURL            = flag.String("sdcpp-url", "", "stable-diffusion.cpp server URL")
+
+	postDelay = flag.Duration("post-delay", 5*time.Second, "delay between post creation attempts")
 )
 
 func discourseImportDiscord(ctx context.Context) error {
@@ -35,6 +37,12 @@ func discourseImportDiscord(ctx context.Context) error {
 	discourseThreads := store.JSON[DiscourseQuestion]{
 		Underlying: st,
 		Prefix:     "discourse-thread",
+	}
+
+	// discourse key -> discord channel ID
+	discourseToDiscord := store.JSON[string]{
+		Underlying: st,
+		Prefix:     "discord-thread-mapping-dev",
 	}
 
 	tigris, err := storage.New(ctx)
@@ -81,43 +89,77 @@ func discourseImportDiscord(ctx context.Context) error {
 
 	var errs []error
 
+	// // For testing, comment out in prod
+	// threads = append([]string{}, threads[0])
+
+	delayTick := time.NewTicker(*postDelay)
+	defer delayTick.Stop()
+
 	for _, key := range threads {
+		lg := slog.With("key", key)
 		thread, err := discourseThreads.Get(ctx, key)
 		if err != nil {
+			lg.Error("can't fetch thread", "err", err)
 			errs = append(errs, fmt.Errorf("while fetching thread %s: %w", key, err))
 			continue
 		}
 
 		if len(thread.Posts) == 0 {
+			lg.Debug("skipping thread with no posts")
 			slog.Info("skipping thread with no posts", "slug", thread.Slug, "title", thread.Title)
 			continue
 		}
 
-		// Create forum thread with the title and first post content
-		msgSend := &discordgo.MessageSend{
-			Content: thread.Posts[0].Body,
-		}
-
-		// Create the thread in the forum channel
-		ch, err := dc.ForumThreadStartComplex(*discordForumChannel,
-			&discordgo.ThreadStart{
-				Name: thread.Title,
-			},
-			msgSend,
-		)
-		if err != nil {
-			errs = append(errs, fmt.Errorf("while creating discord thread for %s: %w", key, err))
+		if discordID, err := discourseToDiscord.Get(ctx, key); err == nil {
+			lg.Info("skipping thread we've already saved", "thread", key, "discord_id", discordID, "err", err)
 			continue
 		}
 
+		op := thread.Posts[0]
+		user := ug.Get(ctx, op.UserID)
+		wh := discordwebhook.Webhook{
+			Content:    op.Body,
+			ThreadName: thread.Title,
+			Username:   user.Username,
+		}
+
+		if user.AvatarKey != "" {
+			wh.AvatarURL = fmt.Sprintf("https://%s.t3.storage.dev/%s", *storeBucket, user.AvatarKey)
+		}
+
 		q := u.Query()
-		q.Set("thread_id", ch.ID)
+		q.Del("thread_id")
+		q.Set("wait", "true")
+
+		u.RawQuery = q.Encode()
+
+		<-delayTick.C
+		req := discordwebhook.Send(u.String(), wh)
+		req.Header.Set("User-Agent", useragent.Generate("tigris-gtm-glue", "https://tigrisdata.com"))
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			lg.Error("can't create thread", "err", err)
+			errs = append(errs, fmt.Errorf("can't create thread %s: %w", key, err))
+			continue
+		}
+		tcr, err := discordwebhook.ParseThreadCreation(resp)
+		if err != nil {
+			lg.Error("can't parse thread creation response", "err", err)
+			errs = append(errs, fmt.Errorf("can't parse thread creation response for %s: %w", key, err))
+			continue
+		}
+
+		discourseToDiscord.Set(ctx, key, tcr.ChannelID)
+
+		q = u.Query()
+		q.Del("wait")
+		q.Set("thread_id", tcr.ChannelID)
 
 		u.RawQuery = q.Encode()
 
 		whurl := u.String()
 
-		slog.Info("created discord forum thread", "slug", thread.Slug, "title", thread.Title, "id", ch.ID)
+		slog.Info("created discord forum thread", "slug", thread.Slug, "title", thread.Title, "id", tcr.ChannelID)
 
 		for i, post := range thread.Posts {
 			if i == 0 {
@@ -135,14 +177,16 @@ func discourseImportDiscord(ctx context.Context) error {
 				wh.AvatarURL = fmt.Sprintf("https://%s.t3.storage.dev/%s", *storeBucket, user.AvatarKey)
 			}
 
+			<-delayTick.C
 			req := discordwebhook.Send(whurl, wh)
 			req.Header.Set("User-Agent", useragent.Generate("tigris-gtm-glue", "https://tigrisdata.com"))
 			resp, err := http.DefaultClient.Do(req)
 			if err != nil {
 				errs = append(errs, fmt.Errorf("can't send %s %dth reply: %w", key, i, err))
 			}
-			if resp.StatusCode != http.StatusNoContent {
-				errs = append(errs, web.NewError(http.StatusNoContent, resp))
+
+			if err := discordwebhook.Validate(resp); err != nil {
+				errs = append(errs, fmt.Errorf("can't post webhook: %w", err))
 			}
 		}
 	}
