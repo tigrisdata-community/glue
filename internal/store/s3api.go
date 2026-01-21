@@ -7,7 +7,6 @@ import (
 	"io"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/smithy-go/logging"
@@ -15,7 +14,7 @@ import (
 
 func NewS3API(ctx context.Context, bucket string) (Interface, error) {
 	cfg, err := awsConfig.LoadDefaultConfig(ctx,
-		config.WithLogger(logging.Nop{}),
+		awsConfig.WithLogger(logging.Nop{}),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("can't load AWS config from environment: %w", err)
