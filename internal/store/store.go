@@ -35,9 +35,8 @@ var (
 	}, []string{"driver", "action"})
 )
 
-// Interface defines the calls that Anubis uses for storage in a local or remote
-// datastore. This can be implemented with an in-memory, on-disk, or in-database
-// storage backend.
+// Interface defines the calls for a generic key value storage interface. This can be
+// implemented with an in-memory, on-disk, or in-database storage backend.
 type Interface interface {
 	// Delete removes a value from the store by key.
 	Delete(ctx context.Context, key string) error
