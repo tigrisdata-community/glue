@@ -1,0 +1,10 @@
+[Unit]
+Description=Discord RSS Webhook Timer
+Requires=discord-rss-webhook.service
+
+[Timer]
+OnCalendar=09:00,15:00 America/Los_Angeles
+Persistent=true
+
+[Install]
+WantedBy=timers.target
