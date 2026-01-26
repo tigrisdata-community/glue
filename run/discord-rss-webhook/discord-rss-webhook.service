@@ -1,0 +1,10 @@
+[Unit]
+Description=Discord RSS Webhook
+After=network.target
+
+[Service]
+Type=oneshot
+User=exedev
+WorkingDirectory=/home/exedev
+EnvironmentFile=/home/exedev/discord-rss-webhook.env
+ExecStart=/home/exedev/bin/discord-rss-webhook
