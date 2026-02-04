@@ -11,6 +11,7 @@ tool (
 )
 
 require (
+	github.com/a-h/templ v0.3.977
 	github.com/aws/aws-sdk-go-v2 v1.41.1
 	github.com/aws/aws-sdk-go-v2/config v1.32.7
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.95.1
@@ -28,6 +29,8 @@ require (
 	github.com/prometheus/client_golang v1.23.2
 	github.com/pstuifzand/ekster v0.0.0-20240904184605-72273498b4a6
 	github.com/tigrisdata/storage-go v0.4.0
+	github.com/yuin/goldmark v1.7.13
+	go.abhg.dev/goldmark/frontmatter v0.3.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -36,7 +39,6 @@ require (
 	github.com/BurntSushi/toml v1.5.0 // indirect
 	github.com/Masterminds/semver/v3 v3.4.0 // indirect
 	github.com/a-h/parse v0.0.0-20250122154542-74294addb73e // indirect
-	github.com/a-h/templ v0.3.977 // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.4 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.7 // indirect
