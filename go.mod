@@ -20,10 +20,12 @@ require (
 	github.com/gen2brain/avif v0.4.4
 	github.com/gen2brain/webp v0.5.5
 	github.com/go-faker/faker/v4 v4.7.0
+	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/joho/godotenv v1.5.1
 	github.com/openai/openai-go/v3 v3.16.0
 	github.com/prometheus/client_golang v1.23.2
-	github.com/tigrisdata/storage-go v0.4.0
+	github.com/pstuifzand/ekster v0.0.0-20240904184605-72273498b4a6
+	github.com/tigrisdata/storage-go v0.4.1
 )
 
 require (
@@ -70,7 +72,6 @@ require (
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
-	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.3.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
@@ -82,7 +83,6 @@ require (
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.66.1 // indirect
 	github.com/prometheus/procfs v0.16.1 // indirect
-	github.com/pstuifzand/ekster v0.0.0-20240904184605-72273498b4a6 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/tetratelabs/wazero v1.9.0 // indirect
 	github.com/tidwall/gjson v1.18.0 // indirect
