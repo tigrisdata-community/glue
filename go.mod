@@ -23,7 +23,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/openai/openai-go/v3 v3.16.0
 	github.com/prometheus/client_golang v1.23.2
-	github.com/tigrisdata/storage-go v0.2.0
+	github.com/tigrisdata/storage-go v0.4.0
 )
 
 require (
