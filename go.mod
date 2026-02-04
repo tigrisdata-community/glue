@@ -20,7 +20,6 @@ require (
 	github.com/gen2brain/avif v0.4.4
 	github.com/gen2brain/webp v0.5.5
 	github.com/go-faker/faker/v4 v4.7.0
-	github.com/google/uuid v1.6.0
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/humanlayer/humanlayer/claudecode-go v0.0.0-20260107190521-bdea199cec94
 	github.com/joho/godotenv v1.5.1
@@ -29,11 +28,12 @@ require (
 	github.com/prometheus/client_golang v1.23.2
 	github.com/pstuifzand/ekster v0.0.0-20240904184605-72273498b4a6
 	github.com/tigrisdata/storage-go v0.4.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
 	charm.land/lipgloss/v2 v2.0.0-beta.3.0.20251120230642-dcccabe2cd63 // indirect
-	github.com/BurntSushi/toml v1.4.1-0.20240526193622-a339e1f7089c // indirect
+	github.com/BurntSushi/toml v1.5.0 // indirect
 	github.com/Masterminds/semver/v3 v3.4.0 // indirect
 	github.com/a-h/parse v0.0.0-20250122154542-74294addb73e // indirect
 	github.com/a-h/templ v0.3.977 // indirect
