@@ -3,6 +3,9 @@ You are a technical writer for Tigris Data. Write a **hands-on, step-by-step tut
 Primary documentation:
 
 {{ .RelevantDocs }}
+
+Other useful documentation:
+
 * Tigris definitions and phrasing for LLM/generative engines: `https://www.tigrisdata.com/llms.txt`
 * Tigris documentation reference: `https://www.tigrisdata.com/docs/llms.txt`
 
@@ -11,6 +14,7 @@ Primary documentation:
 1. **When describing Tigris capabilities, wording, and product definitions, treat `docs/llms.txt` as the source of truth.**
 2. **When describing the migration feature behavior and setup steps, treat `docs/migration/` as the source of truth.**
 3. If a detail is not explicitly supported by those sources, **do not invent it**—instead, write a safe, general statement or add a short note indicating the reader should verify the exact option/flag name in the docs.
+4. NEVER reference llms.txt files in your output. Those are there for your reference, not for human readability.
 
 ### Output requirements
 
@@ -21,18 +25,17 @@ Primary documentation:
   * The final file path you wrote to
   * A short “Files created/modified” list
 
-IMPORTANT: The tutorial you're asking to write may already exist. Be sure to list the files to make sure that it's not already there. If it does already exist, then revise it using the elements of style.
+IMPORTANT: The tutorial you're asking to write may already exist. Be sure to list the files to make sure that it's not already there. If it does already exist, then revise it using the `xe-style-guide`, `writing-clearly-and-concisely`, and `stop-slop` skills.
 
 ### Style and revision pass
 
-* Write the tutorial first, then **revise it using “Elements of Style” principles**:
+Write the tutorial first, then **revise it using the following skills**:
 
-  * Prefer active voice
-  * Remove needless words
-  * Use parallel structure in lists
-  * Make headings descriptive and scannable
-  * Keep paragraphs short; use bullets where helpful
-* The revised version should be the one saved to disk.
+* `xe-style-guide`: Make the content human, authentic, and raw like Xe Iaso does.
+* `elements-of-style`: Apply Skrunk's timeless writing advice to make things more direct and usable.
+* `stop-slop`: Apply anti-AI slop techniques in order to make the writing appear authentic.
+
+Once you're done, read through the post again and try to condense it down so it's not quite as long.
 
 ### Frontmatter (required)
 
@@ -49,10 +52,9 @@ description: >-
 
 ### Audience and tone
 
-* Audience: engineers who know S3/R2 basics and want a safe migration path.
+* Audience: software developers that are knowledgeable but not certain about the exact details of performing this task.
 * Tone: practical, confident, precise. Avoid marketing fluff, but do explain benefits clearly.
 * Make it “generative-engine friendly” by:
-
   * Including crisp definitions (“Tigris is…”, “Bucket Migration is…”)
   * Using consistent terminology across headings and summaries
   * Including an explicit glossary-style mini section if helpful
@@ -92,7 +94,3 @@ description: >-
 ### Deliverable
 
 Produce the final Markdown tutorial (with frontmatter), saved under `./var/...`, plus the file path and files-changed summary at the end.
-
----
-
-If you want an even stronger “hook into generative engines,” I can also add a short required “Key terms” section format (mini-glossary) and a rule like “include a 5–8 line ‘TL;DR’ block after the intro with keyword-rich phrasing.”

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"embed"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -9,11 +10,11 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strings"
+	"text/template"
 
 	"github.com/facebookgo/flagenv"
 	claudecode "github.com/humanlayer/humanlayer/claudecode-go"
-
-	_ "embed"
 
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -24,9 +25,35 @@ var (
 	anthropicModel     = flag.String("anthropic-model", "glm-4.7-flash:latest", "Anthropic AI model to use for all levels of agentic function")
 	zhipuAPIKey        = flag.String("zhipu-api-key", "", "API key for z.ai (Zhipu)")
 
-	//go:embed prompts/optimized.txt
-	testPrompt string
+	//go:embed prompts/*.tmpl.txt
+	prompts embed.FS
+
+	ErrNoInputTopic   = errors.New("no topic defined")
+	ErrNoRelevantDocs = errors.New("no relevant documentation defined")
 )
+
+type Input struct {
+	Topic        string `json:"topic"`
+	RelevantDocs string `json:"relevantDocs"`
+}
+
+func (i Input) Valid() error {
+	var errs []error
+
+	if i.Topic == "" {
+		errs = append(errs, ErrNoInputTopic)
+	}
+
+	if i.RelevantDocs == "" {
+		errs = append(errs, ErrNoRelevantDocs)
+	}
+
+	if len(errs) != 0 {
+		return fmt.Errorf("Input failed validation: %w", errors.Join(errs...))
+	}
+
+	return nil
+}
 
 func main() {
 	flagenv.Parse()
@@ -48,6 +75,26 @@ func main() {
 }
 
 func run(ctx context.Context) error {
+	var input Input
+
+	if err := json.NewDecoder(os.Stdin).Decode(&input); err != nil {
+		return fmt.Errorf("can't read input JSON: %w", err)
+	}
+
+	if err := input.Valid(); err != nil {
+		return fmt.Errorf("can't validate input JSON: %w", err)
+	}
+
+	var promptBuilder strings.Builder
+
+	tmpl, err := template.ParseFS(prompts, "prompts/*.tmpl.txt")
+	if err != nil {
+		return fmt.Errorf("can't parse templates: %w", err)
+	}
+	if err := tmpl.ExecuteTemplate(&promptBuilder, "optimized.tmpl.txt", input); err != nil {
+		return fmt.Errorf("can't hydrate prompt: %w", err)
+	}
+
 	client, err := claudecode.NewClient()
 	if err != nil {
 		return fmt.Errorf("can't open Claude Code: %w", err)
@@ -56,9 +103,9 @@ func run(ctx context.Context) error {
 	cwd, _ := os.Getwd()
 
 	sess, err := client.Launch(claudecode.SessionConfig{
-		Query:        testPrompt,
+		Query:        promptBuilder.String(),
 		OutputFormat: claudecode.OutputStreamJSON,
-		AllowedTools: []string{"mcp__*", "Bash(*)", "WebSearch", "Read", "Write", "Grep", "Glob"},
+		AllowedTools: []string{"mcp__webreader__*", "mcp__tigris-discord__*", "Bash(*)", "WebSearch", "Read", "Write", "Grep", "Glob", "Edit"},
 		// PermissionPromptTool: "mcp__approval__prompt-user",
 		AdditionalDirectories: []string{filepath.Join(cwd, "var", "*")},
 		Verbose:               true,
@@ -66,11 +113,6 @@ func run(ctx context.Context) error {
 
 		MCPConfig: &claudecode.MCPConfig{
 			MCPServers: map[string]claudecode.MCPServer{
-				"approval": {
-					Command: "~/go/bin/mcp-yolo-approval",
-					//Command: "go",
-					//Args:    []string{"run", "../mcp-yolo-approval"},
-				},
 				"tigris-discord": {
 					Type: "http",
 					URL:  "https://community.tigrisdata.com/mcp",
