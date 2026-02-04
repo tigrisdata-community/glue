@@ -95,8 +95,9 @@ Documentation index.`,
 	if !strings.Contains(llmsStr, "# My Site") {
 		t.Errorf("llms.txt missing preamble")
 	}
-	if !strings.Contains(llmsStr, "[Home](./index.md)") {
-		t.Errorf("llms.txt missing Home link")
+	// index.md files are skipped in llms.txt
+	if strings.Contains(llmsStr, "[Home](./index.md)") {
+		t.Errorf("llms.txt should not contain index.md links")
 	}
 	if !strings.Contains(llmsStr, "[About](./about.md)") {
 		t.Errorf("llms.txt missing About link")

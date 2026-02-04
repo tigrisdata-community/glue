@@ -33,11 +33,16 @@ func GenerateLLMsTxt(cfg *Config, pages []*Page) error {
 
 	// Write entries
 	for _, page := range pages {
+		// Skip index.md files in llms.txt
+		if page.IsIndex {
+			continue
+		}
+
 		title := page.Frontmatter.Title
 		link := page.URLPath
 		desc := cleanDescription(page.Frontmatter.Description)
 
-		sb.WriteString(fmt.Sprintf("[%s](%s): %s\n", title, link, desc))
+		sb.WriteString(fmt.Sprintf("* [%s](%s): %s\n", title, link, desc))
 	}
 
 	// Write to file
