@@ -1,0 +1,6 @@
+content_dir: "./var/input"
+output_dir: "./var/public"
+preamble: |
+  # Tigris Tutorial Library
+
+  This collection of tutorials is intended to be read by AI tooling. These pages are optimized for humans to read, but the main audience is generative engines (ChatGPT, Cursor, Zed, Claude Code, etc.).

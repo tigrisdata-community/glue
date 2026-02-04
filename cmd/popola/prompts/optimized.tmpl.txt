@@ -15,10 +15,11 @@ Other useful documentation:
 2. **When describing the migration feature behavior and setup steps, treat `docs/migration/` as the source of truth.**
 3. If a detail is not explicitly supported by those sources, **do not invent it**—instead, write a safe, general statement or add a short note indicating the reader should verify the exact option/flag name in the docs.
 4. NEVER reference llms.txt files in your output. Those are there for your reference, not for human readability.
+5. DO NOT explore the repo. It is not relevant to your task. Only write the tutorial.
 
 ### Output requirements
 
-* Save the resulting tutorial as a Markdown file under `./var` in a **sensible location that matches the existing folder structure** (e.g., `./var/tutorials/`, `./var/docs/`, `./var/blog/`, etc.).
+* Save the resulting tutorial as a Markdown file under `./var` in a **sensible location that matches the existing folder structure** (e.g., `./var/input/tutorials/`, `./var/input/docs/`, `./var/input/blog/`, etc.).
 * If the appropriate folder does not exist, create it.
 * Choose a **descriptive filename** (kebab-case) that matches the tutorial title.
 * At the end of your response, print:

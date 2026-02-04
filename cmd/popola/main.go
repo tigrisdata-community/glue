@@ -105,9 +105,9 @@ func run(ctx context.Context) error {
 	sess, err := client.Launch(claudecode.SessionConfig{
 		Query:        promptBuilder.String(),
 		OutputFormat: claudecode.OutputStreamJSON,
-		AllowedTools: []string{"mcp__webreader__*", "mcp__tigris-discord__*", "Bash(*)", "WebSearch", "Read", "Write", "Grep", "Glob", "Edit"},
+		AllowedTools: []string{"mcp__web-reader__*", "mcp__tigris-discord__*", "Bash(*)", "Bash(find*)", "WebSearch", "Read", "Write", "Grep", "Glob", "Edit", "Update"},
 		// PermissionPromptTool: "mcp__approval__prompt-user",
-		AdditionalDirectories: []string{filepath.Join(cwd, "var", "*")},
+		AdditionalDirectories: []string{filepath.Join(cwd, "var"), cwd},
 		Verbose:               true,
 		WorkingDir:            cwd,
 
