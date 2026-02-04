@@ -44,7 +44,15 @@ func GeneratePages(cfg *Config, pages []*Page) error {
 			if dir == "." {
 				dir = ""
 			}
-			childPages := dirPages[dir]
+			var childPages []*Page
+			if dir == "" {
+				// Root index: show ALL non-index pages
+				for _, pages := range dirPages {
+					childPages = append(childPages, pages...)
+				}
+			} else {
+				childPages = dirPages[dir]
+			}
 
 			var listBuilder strings.Builder
 			listBuilder.WriteString("<ul>")
