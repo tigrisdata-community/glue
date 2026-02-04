@@ -52,7 +52,7 @@ func main() {
 }
 
 func run(ctx context.Context) error {
-	st, err := store.NewS3API(ctx, *storeBucket)
+	st, err := store.NewTigris(ctx, *storeBucket)
 	if err != nil {
 		return err
 	}
