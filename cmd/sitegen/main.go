@@ -6,6 +6,8 @@ import (
 	"log"
 )
 
+//go:generate go tool templ generate
+
 var (
 	configPath = flag.String("config", "sitegen.yaml", "Path to sitegen.yaml configuration file")
 	quiet      = flag.Bool("quiet", false, "Suppress progress output")

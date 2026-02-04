@@ -43,14 +43,14 @@ func skipIfNoCreds(t *testing.T) {
 
 func TestCreateSolution(t *testing.T) {
 	tests := []struct {
-		name           string
-		messageID      string
-		solutionID     string
-		server         *httptest.Server
-		wantResponse   *CreateSolutionResponse
-		wantErr        bool
-		errContains    string
-		isIntegration  bool
+		name          string
+		messageID     string
+		solutionID    string
+		server        *httptest.Server
+		wantResponse  *CreateSolutionResponse
+		wantErr       bool
+		errContains   string
+		isIntegration bool
 	}{
 		{
 			name:       "successful solution creation",

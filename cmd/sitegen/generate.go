@@ -7,8 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/a-h/templ"
 )
 
 func GeneratePages(cfg *Config, pages []*Page) error {
@@ -39,8 +37,8 @@ func GeneratePages(cfg *Config, pages []*Page) error {
 			return fmt.Errorf("creating directory: %w", err)
 		}
 
-		// Build page list for index files
-		var content templ.Component
+		// Build page list for index files - append to body
+		bodyHTML := page.Frontmatter.Body
 		if page.IsIndex {
 			dir := filepath.Dir(page.URLPath)
 			if dir == "." {
@@ -56,12 +54,10 @@ func GeneratePages(cfg *Config, pages []*Page) error {
 				listBuilder.WriteString(fmt.Sprintf("<li><a href=\"%s\">%s</a>: %s</li>", href, cp.Frontmatter.Title, desc))
 			}
 			listBuilder.WriteString("</ul>")
-			pageListHTML := listBuilder.String()
-
-			content = PageIndex(page.Frontmatter.Title, page.Frontmatter.Body, pageListHTML)
-		} else {
-			content = PageView(page.Frontmatter.Title, page.Frontmatter.Body)
+			bodyHTML += listBuilder.String()
 		}
+
+		content := PageView(page.Frontmatter.Title, bodyHTML)
 
 		// Render HTML
 		baseTempl := Base(page.Frontmatter.Title, content)

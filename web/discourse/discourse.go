@@ -160,59 +160,59 @@ func GetTopic(ctx context.Context, u string) (*TopicResult, error) {
 }
 
 type TopicResult struct {
-	PostStream       PostStream       `json:"post_stream"`
-	TimelineLookup   [][]int          `json:"timeline_lookup"`
-	SuggestedTopics  []Topics         `json:"suggested_topics"`
-	Tags             []string         `json:"tags"`
-	TagsDescriptions any              `json:"tags_descriptions"`
-	FancyTitle       string           `json:"fancy_title"`
-	ID               int              `json:"id"`
-	Title            string           `json:"title"`
-	PostsCount       int              `json:"posts_count"`
-	CreatedAt        time.Time        `json:"created_at"`
-	Views            int              `json:"views"`
-	ReplyCount       int              `json:"reply_count"`
-	LikeCount        int              `json:"like_count"`
-	LastPostedAt     time.Time        `json:"last_posted_at"`
-	Visible          bool             `json:"visible"`
-	Closed           bool             `json:"closed"`
-	Archived         bool             `json:"archived"`
-	HasSummary       bool             `json:"has_summary"`
-	Archetype        string           `json:"archetype"`
-	Slug             string           `json:"slug"`
-	CategoryID       int              `json:"category_id"`
-	WordCount        int              `json:"word_count"`
-	DeletedAt        any              `json:"deleted_at"`
-	UserID           int              `json:"user_id"`
-	FeaturedLink     any              `json:"featured_link"`
-	PinnedGlobally   bool             `json:"pinned_globally"`
-	PinnedAt         any              `json:"pinned_at"`
-	PinnedUntil      any              `json:"pinned_until"`
-	ImageURL         any              `json:"image_url"`
-	SlowModeSeconds  int              `json:"slow_mode_seconds"`
-	Draft            any              `json:"draft"`
-	DraftKey         string           `json:"draft_key,omitempty"`
-	DraftSequence    any              `json:"draft_sequence,omitempty"`
-	Unpinned         any              `json:"unpinned"`
-	Pinned           bool             `json:"pinned"`
-	CurrentPostNumber int             `json:"current_post_number"`
-	HighestPostNumber int             `json:"highest_post_number"`
-	DeletedBy        any              `json:"deleted_by"`
-	ActionsSummary   []ActionsSummary `json:"actions_summary"`
-	ChunkSize        int              `json:"chunk_size"`
-	Bookmarked       bool             `json:"bookmarked"`
-	TopicTimer       *TopicTimer      `json:"topic_timer,omitempty"`
-	MessageBusLastID int              `json:"message_bus_last_id"`
-	ParticipantCount int              `json:"participant_count"`
-	ShowReadIndicator bool            `json:"show_read_indicator"`
-	Thumbnails       any              `json:"thumbnails"`
-	SlowModeEnabledUntil any           `json:"slow_mode_enabled_until"`
-	AcceptedAnswer   *AcceptedAnswer  `json:"accepted_answer,omitempty"`
-	CanVote          bool             `json:"can_vote"`
-	VoteCount        int              `json:"vote_count"`
-	UserVoted        bool             `json:"user_voted"`
-	Details          TopicDetails     `json:"details"`
-	Bookmarks        any              `json:"bookmarks"`
+	PostStream           PostStream       `json:"post_stream"`
+	TimelineLookup       [][]int          `json:"timeline_lookup"`
+	SuggestedTopics      []Topics         `json:"suggested_topics"`
+	Tags                 []string         `json:"tags"`
+	TagsDescriptions     any              `json:"tags_descriptions"`
+	FancyTitle           string           `json:"fancy_title"`
+	ID                   int              `json:"id"`
+	Title                string           `json:"title"`
+	PostsCount           int              `json:"posts_count"`
+	CreatedAt            time.Time        `json:"created_at"`
+	Views                int              `json:"views"`
+	ReplyCount           int              `json:"reply_count"`
+	LikeCount            int              `json:"like_count"`
+	LastPostedAt         time.Time        `json:"last_posted_at"`
+	Visible              bool             `json:"visible"`
+	Closed               bool             `json:"closed"`
+	Archived             bool             `json:"archived"`
+	HasSummary           bool             `json:"has_summary"`
+	Archetype            string           `json:"archetype"`
+	Slug                 string           `json:"slug"`
+	CategoryID           int              `json:"category_id"`
+	WordCount            int              `json:"word_count"`
+	DeletedAt            any              `json:"deleted_at"`
+	UserID               int              `json:"user_id"`
+	FeaturedLink         any              `json:"featured_link"`
+	PinnedGlobally       bool             `json:"pinned_globally"`
+	PinnedAt             any              `json:"pinned_at"`
+	PinnedUntil          any              `json:"pinned_until"`
+	ImageURL             any              `json:"image_url"`
+	SlowModeSeconds      int              `json:"slow_mode_seconds"`
+	Draft                any              `json:"draft"`
+	DraftKey             string           `json:"draft_key,omitempty"`
+	DraftSequence        any              `json:"draft_sequence,omitempty"`
+	Unpinned             any              `json:"unpinned"`
+	Pinned               bool             `json:"pinned"`
+	CurrentPostNumber    int              `json:"current_post_number"`
+	HighestPostNumber    int              `json:"highest_post_number"`
+	DeletedBy            any              `json:"deleted_by"`
+	ActionsSummary       []ActionsSummary `json:"actions_summary"`
+	ChunkSize            int              `json:"chunk_size"`
+	Bookmarked           bool             `json:"bookmarked"`
+	TopicTimer           *TopicTimer      `json:"topic_timer,omitempty"`
+	MessageBusLastID     int              `json:"message_bus_last_id"`
+	ParticipantCount     int              `json:"participant_count"`
+	ShowReadIndicator    bool             `json:"show_read_indicator"`
+	Thumbnails           any              `json:"thumbnails"`
+	SlowModeEnabledUntil any              `json:"slow_mode_enabled_until"`
+	AcceptedAnswer       *AcceptedAnswer  `json:"accepted_answer,omitempty"`
+	CanVote              bool             `json:"can_vote"`
+	VoteCount            int              `json:"vote_count"`
+	UserVoted            bool             `json:"user_voted"`
+	Details              TopicDetails     `json:"details"`
+	Bookmarks            any              `json:"bookmarks"`
 }
 
 // JSONURL returns the relative path to the JSON API for this topic.
@@ -294,11 +294,11 @@ type User struct {
 }
 
 type LinkCount struct {
-	URL         string `json:"url"`
-	Internal    bool   `json:"internal"`
-	Reflection  bool   `json:"reflection"`
-	Title       string `json:"title"`
-	Clicks      int    `json:"clicks"`
+	URL        string `json:"url"`
+	Internal   bool   `json:"internal"`
+	Reflection bool   `json:"reflection"`
+	Title      string `json:"title"`
+	Clicks     int    `json:"clicks"`
 }
 
 type ActionsSummary struct {
@@ -308,29 +308,29 @@ type ActionsSummary struct {
 }
 
 type TopicTimer struct {
-	ID               int       `json:"id"`
-	ExecuteAt        time.Time `json:"execute_at"`
-	DurationMinutes  int       `json:"duration_minutes"`
-	BasedOnLastPost  bool      `json:"based_on_last_post"`
-	StatusType       string    `json:"status_type"`
-	CategoryID       any       `json:"category_id"`
+	ID              int       `json:"id"`
+	ExecuteAt       time.Time `json:"execute_at"`
+	DurationMinutes int       `json:"duration_minutes"`
+	BasedOnLastPost bool      `json:"based_on_last_post"`
+	StatusType      string    `json:"status_type"`
+	CategoryID      any       `json:"category_id"`
 }
 
 type AcceptedAnswer struct {
-	PostNumber  int    `json:"post_number"`
-	Username    string `json:"username"`
-	Name        any    `json:"name"`
-	Excerpt     string `json:"excerpt"`
+	PostNumber   int    `json:"post_number"`
+	Username     string `json:"username"`
+	Name         any    `json:"name"`
+	Excerpt      string `json:"excerpt"`
 	AccepterName any    `json:"accepter_name"`
 }
 
 type TopicDetails struct {
-	CanEdit          bool          `json:"can_edit"`
-	NotificationLevel int          `json:"notification_level"`
-	Participants     []User        `json:"participants"`
-	CreatedBy        User          `json:"created_by"`
-	LastPoster       User          `json:"last_poster"`
-	Links            []TopicLink   `json:"links"`
+	CanEdit           bool        `json:"can_edit"`
+	NotificationLevel int         `json:"notification_level"`
+	Participants      []User      `json:"participants"`
+	CreatedBy         User        `json:"created_by"`
+	LastPoster        User        `json:"last_poster"`
+	Links             []TopicLink `json:"links"`
 }
 
 type TopicLink struct {

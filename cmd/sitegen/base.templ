@@ -24,11 +24,4 @@ templ PageView(title string, bodyHTML string) {
 	</article>
 }
 
-templ PageIndex(title string, bodyHTML string, pageListHTML string) {
-	<article>
-		<h1>{ title }</h1>
-		@templ.Raw(pageListHTML)
-		@templ.Raw(bodyHTML)
-	</article>
-}
 
