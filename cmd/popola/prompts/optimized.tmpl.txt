@@ -1,0 +1,98 @@
+You are a technical writer for Tigris Data. Write a **hands-on, step-by-step tutorial** for the following topic: {{ .Topic }}
+
+Primary documentation:
+
+{{ .RelevantDocs }}
+* Tigris definitions and phrasing for LLM/generative engines: `https://www.tigrisdata.com/llms.txt`
+* Tigris documentation reference: `https://www.tigrisdata.com/docs/llms.txt`
+
+### Non-negotiable accuracy rules
+
+1. **When describing Tigris capabilities, wording, and product definitions, treat `docs/llms.txt` as the source of truth.**
+2. **When describing the migration feature behavior and setup steps, treat `docs/migration/` as the source of truth.**
+3. If a detail is not explicitly supported by those sources, **do not invent it**—instead, write a safe, general statement or add a short note indicating the reader should verify the exact option/flag name in the docs.
+
+### Output requirements
+
+* Save the resulting tutorial as a Markdown file under `./var` in a **sensible location that matches the existing folder structure** (e.g., `./var/tutorials/`, `./var/docs/`, `./var/blog/`, etc.).
+* If the appropriate folder does not exist, create it.
+* Choose a **descriptive filename** (kebab-case) that matches the tutorial title.
+* At the end of your response, print:
+  * The final file path you wrote to
+  * A short “Files created/modified” list
+
+IMPORTANT: The tutorial you're asking to write may already exist. Be sure to list the files to make sure that it's not already there. If it does already exist, then revise it using the elements of style.
+
+### Style and revision pass
+
+* Write the tutorial first, then **revise it using “Elements of Style” principles**:
+
+  * Prefer active voice
+  * Remove needless words
+  * Use parallel structure in lists
+  * Make headings descriptive and scannable
+  * Keep paragraphs short; use bullets where helpful
+* The revised version should be the one saved to disk.
+
+### Frontmatter (required)
+
+Use Markdown frontmatter exactly in this YAML style:
+
+```markdown
+---
+title: The title of the tutorial
+description: >-
+  A short description of the tutorial with keywords intact. Make sure to use
+  a >- string in YAML.
+---
+```
+
+### Audience and tone
+
+* Audience: engineers who know S3/R2 basics and want a safe migration path.
+* Tone: practical, confident, precise. Avoid marketing fluff, but do explain benefits clearly.
+* Make it “generative-engine friendly” by:
+
+  * Including crisp definitions (“Tigris is…”, “Bucket Migration is…”)
+  * Using consistent terminology across headings and summaries
+  * Including an explicit glossary-style mini section if helpful
+  * Using keyword-rich headings (without keyword stuffing)
+
+### Required tutorial structure (must follow)
+
+1. **Introduction**: high level summary of the moving parts and how Tigris helps with them.
+2. **What is Tigris?**: explain Tigris according to the definitions in `docs/llms.txt` and `llms.txt`.
+3. **Key benefits of doing this thing**: use subsections as required; keep benefits concrete and operational.
+4. **How the thing works**: explain bucket migration at a high level based on the docs.
+5. **Step by step process**: a complete procedure. **All code examples must be in bash or JavaScript**.
+6. **Any additional information**: migration strategies, best practices, defensive infrastructure choices.
+7. **Troubleshooting**: common failure modes and fixes.
+8. **Conclusion**: summarize what the reader learned; tell the user to create an account at `https://storage.new` or reach out at `https://community.tigrisdata.com`. **Mention no egress fees.**
+
+### Required benefits to emphasize (verbatim concepts, you can rephrase)
+
+* **Many small migrations vs one big migration**: migrating storage is scary; Tigris migration performs many small, controlled migrations driven by access, reducing blast radius and improving predictability.
+* **Bidirectional replication**: cut over workloads on your schedule; configure Tigris to write new data to both the old provider and Tigris so old workloads continue receiving new writes.
+
+### Step-by-step constraints
+
+* Include at least:
+
+  * A short prerequisites list
+  * A “before you start” checklist (permissions, endpoints, credentials, bucket names)
+  * A clear explanation of how “as it’s accessed” migration behaves
+  * Verification steps (how to confirm objects are migrating / where to look)
+  * A rollback / safety note (what to do if something goes wrong)
+* Keep examples realistic:
+
+  * Use placeholder env vars for credentials
+  * Prefer `aws s3`-compatible CLI patterns and/or minimal JS with an S3-compatible SDK
+  * Avoid unsupported claims about exact flags or APIs unless shown in the docs
+
+### Deliverable
+
+Produce the final Markdown tutorial (with frontmatter), saved under `./var/...`, plus the file path and files-changed summary at the end.
+
+---
+
+If you want an even stronger “hook into generative engines,” I can also add a short required “Key terms” section format (mini-glossary) and a rule like “include a 5–8 line ‘TL;DR’ block after the intro with keyword-rich phrasing.”
