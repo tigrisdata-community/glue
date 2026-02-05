@@ -15,8 +15,7 @@ Other useful documentation:
 2. **When describing the migration feature behavior and setup steps, treat `docs/migration/` as the source of truth.**
 3. If a detail is not explicitly supported by those sources, **do not invent it**—instead, write a safe, general statement or add a short note indicating the reader should verify the exact option/flag name in the docs.
 4. NEVER reference llms.txt files in your output. Those are there for your reference, not for human readability.
-5. DO NOT explore the repo. It is not relevant to your task. Only write the tutorial.
-6. When fetching information from the web, use the `mcp__web-reader__webReader tool.
+5. When fetching information from the web, use the `mcp__web-reader__webReader tool.
 
 ### Output requirements
 
