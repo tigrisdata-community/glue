@@ -176,16 +176,14 @@ func run(ctx context.Context) error {
 		return fmt.Errorf("can't open Claude Code: %w", err)
 	}
 
-	cwd, _ := os.Getwd()
-
 	sess, err := client.Launch(claudecode.SessionConfig{
 		Query:        promptBuilder.String(),
 		OutputFormat: claudecode.OutputStreamJSON,
 		AllowedTools: []string{"mcp__web-reader__*", "mcp__tigris-discord__*", "Bash(*)", "Bash(find*)", "WebSearch", "Read", "Write", "Grep", "Glob", "Edit", "Update"},
 		// PermissionPromptTool: "mcp__approval__prompt-user",
-		AdditionalDirectories: []string{*outputFolder, cwd},
+		AdditionalDirectories: []string{*outputFolder},
 		Verbose:               true,
-		WorkingDir:            cwd,
+		WorkingDir:            *outputFolder,
 
 		MCPConfig: &claudecode.MCPConfig{
 			MCPServers: map[string]claudecode.MCPServer{
