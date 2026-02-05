@@ -9,7 +9,8 @@
   "scripts": {
     "test": "go test ./...",
     "format": "go tool goimports -w . && prettier -w .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "build": "mkdir -p ./var/bin && go build -o ./var/bin ./cmd/..."
   },
   "devDependencies": {
     "@commitlint/cli": "^20.3.1",

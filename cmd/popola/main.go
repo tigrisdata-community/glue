@@ -9,10 +9,14 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"path/filepath"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/facebookgo/flagenv"
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/object"
 	claudecode "github.com/humanlayer/humanlayer/claudecode-go"
 
 	_ "github.com/joho/godotenv/autoload"
@@ -30,6 +34,7 @@ var (
 
 	ErrNoInputTopic   = errors.New("no topic defined")
 	ErrNoRelevantDocs = errors.New("no relevant documentation defined")
+	NoChangesToCommit = errors.New("no changes to commit")
 )
 
 type Input struct {
@@ -53,6 +58,74 @@ func (i Input) Valid() error {
 		return fmt.Errorf("Input failed validation: %w", errors.Join(errs...))
 	}
 
+	return nil
+}
+
+func commitChanges(repoPath, outputFolder, topic string) error {
+	repo, err := git.PlainOpen(repoPath)
+	if err != nil {
+		return fmt.Errorf("can't open git repo: %w", err)
+	}
+
+	worktree, err := repo.Worktree()
+	if err != nil {
+		return fmt.Errorf("can't get worktree: %w", err)
+	}
+
+	// Get status to find changes in output folder
+	status, err := worktree.Status()
+	if err != nil {
+		return fmt.Errorf("can't get git status: %w", err)
+	}
+
+	// Collect files in output folder that have changes
+	var filesToCommit []string
+	outputFolderAbs, err := filepath.Abs(outputFolder)
+	if err != nil {
+		return fmt.Errorf("can't get absolute path for output folder: %w", err)
+	}
+
+	for file, st := range status {
+		if st.Worktree == git.Unmodified {
+			continue
+		}
+		// Check if file is in or under the output folder
+		absPath, err := filepath.Abs(file)
+		if err != nil {
+			continue
+		}
+		if strings.HasPrefix(absPath, outputFolderAbs) || strings.HasPrefix(file, outputFolder) {
+			filesToCommit = append(filesToCommit, file)
+		}
+	}
+
+	if len(filesToCommit) == 0 {
+		return NoChangesToCommit
+	}
+
+	// Add all changed files in output folder
+	for _, file := range filesToCommit {
+		if _, err := worktree.Add(file); err != nil {
+			return fmt.Errorf("can't stage file %s: %w", file, err)
+		}
+	}
+
+	// Create commit message
+	commitMsg := fmt.Sprintf("docs: %s\n\nAssisted-by: GLM 4.7 via Claude Code\nSigned-off-by: Xe Iaso <xe@tigrisdata.com>", topic)
+
+	// Commit
+	_, err = worktree.Commit(commitMsg, &git.CommitOptions{
+		Author: &object.Signature{
+			Name:  "Xe Iaso",
+			Email: "xe@tigrisdata.com",
+			When:  time.Now(),
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("can't commit: %w", err)
+	}
+
+	slog.Info("committed changes", "output_folder", outputFolder, "files", len(filesToCommit), "topic", topic)
 	return nil
 }
 
@@ -217,6 +290,15 @@ func run(ctx context.Context) error {
 		return fmt.Errorf("got error from Claude: %s", result.Error)
 	} else {
 		lg.Info("got result", "session", sess.ID, "type", result.Type, "subtype", result.Subtype, "cost_usd", result.CostUSD, "duration_ms", result.DurationMS, "num_turns", result.NumTurns)
+	}
+
+	// Commit any changes made in the output folder
+	if err := commitChanges(*outputFolder, *outputFolder, input.Topic); err != nil {
+		if errors.Is(err, NoChangesToCommit) {
+			slog.Info("no changes to commit in output folder")
+		} else {
+			slog.Error("failed to commit changes", "err", err)
+		}
 	}
 
 	return nil
