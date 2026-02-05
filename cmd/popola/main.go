@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
-	"path/filepath"
 	"strings"
 	"text/template"
 
@@ -24,6 +23,7 @@ var (
 	anthropicBaseURL   = flag.String("anthropic-base-url", "http://localhost:11434", "Anthropic API base URL")
 	anthropicModel     = flag.String("anthropic-model", "glm-4.7-flash:latest", "Anthropic AI model to use for all levels of agentic function")
 	zhipuAPIKey        = flag.String("zhipu-api-key", "", "API key for z.ai (Zhipu)")
+	outputFolder       = flag.String("output-folder", "./var", "Output folder for generated content")
 
 	//go:embed prompts/*.tmpl.txt
 	prompts embed.FS
@@ -35,6 +35,7 @@ var (
 type Input struct {
 	Topic        string `json:"topic"`
 	RelevantDocs string `json:"relevantDocs"`
+	OutputFolder string `json:"outputFolder"`
 }
 
 func (i Input) Valid() error {
@@ -85,6 +86,8 @@ func run(ctx context.Context) error {
 		return fmt.Errorf("can't validate input JSON: %w", err)
 	}
 
+	input.OutputFolder = *outputFolder
+
 	var promptBuilder strings.Builder
 
 	tmpl, err := template.ParseFS(prompts, "prompts/*.tmpl.txt")
@@ -107,7 +110,7 @@ func run(ctx context.Context) error {
 		OutputFormat: claudecode.OutputStreamJSON,
 		AllowedTools: []string{"mcp__web-reader__*", "mcp__tigris-discord__*", "Bash(*)", "Bash(find*)", "WebSearch", "Read", "Write", "Grep", "Glob", "Edit", "Update"},
 		// PermissionPromptTool: "mcp__approval__prompt-user",
-		AdditionalDirectories: []string{filepath.Join(cwd, "var"), cwd},
+		AdditionalDirectories: []string{*outputFolder, cwd},
 		Verbose:               true,
 		WorkingDir:            cwd,
 
@@ -151,7 +154,46 @@ func run(ctx context.Context) error {
 			for _, part := range event.Message.Content {
 				switch part.Type {
 				case "tool_use":
-					lg.Info("using tool", "tool", part.Name, "input", part.Input)
+					switch part.Name {
+					case "TodoWrite":
+						inputMap := make(map[string]any, len(part.Input))
+						for k, v := range part.Input {
+							inputMap[k] = v
+						}
+						if todoList, err := ParseTodoFromMap(inputMap); err == nil {
+							for _, todo := range todoList.Todos {
+								lg.Info("todo", "status", todo.Status, "content", todo.Content)
+							}
+						} else {
+							lg.Info("using tool", "tool", part.Name, "input", part.Input)
+						}
+					case "mcp__web-reader__webReader":
+						if url, ok := part.Input["url"].(string); ok {
+							lg.Info("fetching docs", "url", url)
+						} else {
+							lg.Info("using tool", "tool", part.Name, "input", part.Input)
+						}
+					case "Read":
+						if path, ok := part.Input["file_path"].(string); ok {
+							lg.Info("reading file", "path", path)
+						} else {
+							lg.Info("using tool", "tool", part.Name, "input", part.Input)
+						}
+					case "Write":
+						if path, ok := part.Input["file_path"].(string); ok {
+							lg.Info("writing file", "path", path)
+						} else {
+							lg.Info("using tool", "tool", part.Name, "input", part.Input)
+						}
+					case "Edit":
+						if path, ok := part.Input["file_path"].(string); ok {
+							lg.Info("editing file", "path", path)
+						} else {
+							lg.Info("using tool", "tool", part.Name, "input", part.Input)
+						}
+					default:
+						lg.Info("using tool", "tool", part.Name, "input", part.Input)
+					}
 				case "tool_result":
 					lg.Info("tool result", "tool", part.Name)
 					json.NewEncoder(os.Stdout).Encode(part)

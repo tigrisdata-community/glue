@@ -1,4 +1,4 @@
 {
-  "topic": "Migrating data from Cloudflare R2 to Tigris",
-  "relevantDocs": "* https://www.tigrisdata.com/docs/migration/"
+  "topic": "Using Tigris from AWS with Node.js",
+  "relevantDocs": "* https://www.tigrisdata.com/docs/quickstarts/node/\n* https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create_deploy_nodejs.html\n* https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-up-node.html\n* https://www.tigrisdata.com/docs/sdks/tigris/"
 }
