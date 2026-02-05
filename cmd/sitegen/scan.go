@@ -10,7 +10,8 @@ type Page struct {
 	InputPath   string // Full path to source .md file
 	OutputPath  string // Full path to output .html file
 	OutputMD    string // Full path to copied .md file
-	URLPath     string // Relative path for linking (e.g., "./guide/setup.md")
+	URLPath     string // Relative path for HTML linking (e.g., "./guide/setup.html")
+	MDPath      string // Relative path for md linking (e.g., "./guide/setup.md")
 	IsIndex     bool   // True if filename is index.md
 	Frontmatter *Frontmatter
 }
@@ -36,7 +37,8 @@ func ScanContent(contentDir string) ([]*Page, error) {
 
 		pages = append(pages, &Page{
 			InputPath: path,
-			URLPath:   "./" + relPath,
+			URLPath:   "./" + strings.TrimSuffix(relPath, ".md") + ".html",
+			MDPath:    "./" + relPath,
 			IsIndex:   filepath.Base(path) == "index.md",
 		})
 

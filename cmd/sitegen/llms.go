@@ -39,7 +39,7 @@ func GenerateLLMsTxt(cfg *Config, pages []*Page) error {
 		}
 
 		title := page.Frontmatter.Title
-		link := page.URLPath
+		link := page.MDPath
 		desc := cleanDescription(page.Frontmatter.Description)
 
 		sb.WriteString(fmt.Sprintf("* [%s](%s): %s\n", title, link, desc))

@@ -22,21 +22,21 @@ func TestGenerateLLMsTxt(t *testing.T) {
 
 	pages := []*Page{
 		{
-			URLPath: "./index.md",
+			MDPath: "./index.md",
 			Frontmatter: &Frontmatter{
 				Title:       "Main Page",
 				Description: "The main index page",
 			},
 		},
 		{
-			URLPath: "./guide/setup.md",
+			MDPath: "./guide/setup.md",
 			Frontmatter: &Frontmatter{
 				Title:       "Setup Guide",
 				Description: "How to get started",
 			},
 		},
 		{
-			URLPath: "./api/reference.md",
+			MDPath: "./api/reference.md",
 			Frontmatter: &Frontmatter{
 				Title:       "API Reference",
 				Description: "API docs with   extra    spaces\nand newlines",
