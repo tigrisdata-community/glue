@@ -1,4 +1,4 @@
 {
-  "topic": "Using Tigris from AWS with Node.js",
-  "relevantDocs": "* https://www.tigrisdata.com/docs/quickstarts/node/\n* https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create_deploy_nodejs.html\n* https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-up-node.html\n* https://www.tigrisdata.com/docs/sdks/tigris/"
+  "topic": "Switching from AWS SDK to Tigris SDK in JavaScript",
+  "relevantDocs": "* https://raw.githubusercontent.com/tigrisdata/storage/refs/heads/main/packages/storage/README.md\n* https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/\n* https://www.tigrisdata.com/docs/sdks/tigris/"
 }
