@@ -32,9 +32,9 @@ var (
 	//go:embed prompts/*.tmpl.txt
 	prompts embed.FS
 
-	ErrNoInputTopic   = errors.New("no topic defined")
-	ErrNoRelevantDocs = errors.New("no relevant documentation defined")
-	NoChangesToCommit = errors.New("no changes to commit")
+	ErrNoInputTopic      = errors.New("no topic defined")
+	ErrNoRelevantDocs    = errors.New("no relevant documentation defined")
+	ErrNoChangesToCommit = errors.New("no changes to commit")
 )
 
 type Input struct {
@@ -100,7 +100,7 @@ func commitChanges(repoPath, outputFolder, topic string) error {
 	}
 
 	if len(filesToCommit) == 0 {
-		return NoChangesToCommit
+		return ErrNoChangesToCommit
 	}
 
 	// Add all changed files in output folder
@@ -294,7 +294,7 @@ func run(ctx context.Context) error {
 
 	// Commit any changes made in the output folder
 	if err := commitChanges(*outputFolder, *outputFolder, input.Topic); err != nil {
-		if errors.Is(err, NoChangesToCommit) {
+		if errors.Is(err, ErrNoChangesToCommit) {
 			slog.Info("no changes to commit in output folder")
 		} else {
 			slog.Error("failed to commit changes", "err", err)
