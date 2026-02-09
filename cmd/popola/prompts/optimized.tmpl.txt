@@ -33,6 +33,7 @@ IMPORTANT: The tutorial you're asking to write may already exist. Be sure to lis
 Write the tutorial first, then **revise it using the following skills**:
 
 * `xe-style-guide`: Make the content human, authentic, and raw like Xe Iaso does.
+* `seo-aeo-best-practices`: Make the content follow SEO / AEO best practices so agents hook into it more easily.
 * `elements-of-style`: Apply Skrunk's timeless writing advice to make things more direct and usable.
 * `stop-slop`: Apply anti-AI slop techniques in order to make the writing appear authentic.
 

@@ -1,4 +1,4 @@
 {
-  "topic": "Switching from AWS SDK to Tigris SDK in JavaScript",
-  "relevantDocs": "* https://raw.githubusercontent.com/tigrisdata/storage/refs/heads/main/packages/storage/README.md\n* https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/\n* https://www.tigrisdata.com/docs/sdks/tigris/"
+  "topic": "Migrating from Backblaze B2 to Tigris",
+  "relevantDocs": "* https://www.tigrisdata.com/docs/migration/"
 }
