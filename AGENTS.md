@@ -6,12 +6,15 @@ This is a repository full of code written in Go. Use the table driven testing sk
 
 ### Build, Test & Development Commands
 
-| Command          | Description                                        |
-| ---------------- | -------------------------------------------------- |
-| `npm test`       | Runs tests with `go test ./...`.                   |
-| `go build ./...` | Compiles all Go packages.                          |
-| `go test ./...`  | Runs all tests.                                    |
-| `npm run format` | Formats Go (`goimports`) and JS/HTML (`prettier`). |
+| Command          | Description                                                 |
+| ---------------- | ----------------------------------------------------------- |
+| `npm run build`  | Builds all Go packages, outputting binaries to `./var/bin`. |
+| `npm test`       | Runs tests with `go test ./...`.                            |
+| `go build ./...` | Compiles all Go packages.                                   |
+| `go test ./...`  | Runs all tests.                                             |
+| `npm run format` | Formats Go (`goimports`) and JS/HTML (`prettier`).          |
+
+**Important**: When building Go binaries, always output to `./var/bin` (e.g., `go build -o ./var/bin ./cmd/popola`). This keeps build artifacts out of the repository root.
 
 ### Code Formatting & Style
 
