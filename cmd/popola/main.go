@@ -179,11 +179,12 @@ func run(ctx context.Context) error {
 	sess, err := client.Launch(claudecode.SessionConfig{
 		Query:        promptBuilder.String(),
 		OutputFormat: claudecode.OutputStreamJSON,
-		AllowedTools: []string{"mcp__web-reader__*", "mcp__tigris-discord__*", "Bash(*)", "Bash(find*)", "WebSearch", "Read", "Write", "Grep", "Glob", "Edit", "Update"},
+		AllowedTools: []string{"mcp__web-reader__*", "mcp__tigris-discord__*", "Bash(*)", "Bash(find*)", "WebSearch", "Read", "Write", "Grep", "Glob", "Edit", "Update", "WebFetch"},
 		// PermissionPromptTool: "mcp__approval__prompt-user",
 		AdditionalDirectories: []string{*outputFolder},
 		Verbose:               true,
 		WorkingDir:            *outputFolder,
+		Model:                 claudecode.Model("glm-4.7"),
 
 		MCPConfig: &claudecode.MCPConfig{
 			MCPServers: map[string]claudecode.MCPServer{
@@ -262,6 +263,10 @@ func run(ctx context.Context) error {
 						} else {
 							lg.Info("using tool", "tool", part.Name, "input", part.Input)
 						}
+					case "Bash":
+						command, _ := part.Input["command"].(string)
+						description, _ := part.Input["description"].(string)
+						lg.Info("running command", "command", command, "description", description)
 					default:
 						lg.Info("using tool", "tool", part.Name, "input", part.Input)
 					}
