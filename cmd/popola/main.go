@@ -61,7 +61,69 @@ func (i Input) Valid() error {
 	return nil
 }
 
-func commitChanges(repoPath, outputFolder, topic string) error {
+// logToolUse logs a tool invocation, extracting a named string field for a concise message.
+// Falls back to logging the full input if the field is missing.
+func logToolUse(lg *slog.Logger, toolName, verb, field string, input map[string]any) {
+	if val, ok := input[field].(string); ok {
+		lg.Info(verb, field, val)
+	} else {
+		lg.Info("using tool", "tool", toolName, "input", input)
+	}
+}
+
+func handleEvent(lg *slog.Logger, event claudecode.StreamEvent) {
+	lg.Info("got event", "type", event.Type, "subtype", event.Subtype, "is_error", event.IsError)
+
+	if event.IsError {
+		lg.Error("execution error", "err", event.Error)
+	}
+
+	if event.Message == nil {
+		return
+	}
+
+	for _, part := range event.Message.Content {
+		switch part.Type {
+		case "tool_use":
+			switch part.Name {
+			case "TodoWrite":
+				if todoList, err := ParseTodoFromMap(part.Input); err == nil {
+					for _, todo := range todoList.Todos {
+						lg.Info("todo", "status", todo.Status, "content", todo.Content)
+					}
+				} else {
+					lg.Info("using tool", "tool", part.Name, "input", part.Input)
+				}
+			case "mcp__web-reader__webReader":
+				logToolUse(lg, part.Name, "fetching docs", "url", part.Input)
+			case "Read":
+				logToolUse(lg, part.Name, "reading file", "file_path", part.Input)
+			case "Write":
+				logToolUse(lg, part.Name, "writing file", "file_path", part.Input)
+			case "Edit":
+				logToolUse(lg, part.Name, "editing file", "file_path", part.Input)
+			case "Bash":
+				command, _ := part.Input["command"].(string)
+				description, _ := part.Input["description"].(string)
+				lg.Info("running command", "command", command, "description", description)
+			default:
+				lg.Info("using tool", "tool", part.Name, "input", part.Input)
+			}
+		case "tool_result":
+			lg.Info("tool result", "tool", part.Name)
+			json.NewEncoder(os.Stdout).Encode(part)
+			fmt.Println()
+		}
+
+		if part.Text != "" {
+			fmt.Printf("%s> %s\n", event.Message.Role, part.Text)
+		}
+
+		lg.Info("message type", "type", event.Type, "subtype", event.Subtype, "message_type", part.Type)
+	}
+}
+
+func commitChanges(repoPath, outputFolder, topic, model string) error {
 	repo, err := git.PlainOpen(repoPath)
 	if err != nil {
 		return fmt.Errorf("can't open git repo: %w", err)
@@ -110,10 +172,8 @@ func commitChanges(repoPath, outputFolder, topic string) error {
 		}
 	}
 
-	// Create commit message
-	commitMsg := fmt.Sprintf("docs: %s\n\nAssisted-by: GLM 4.7 via Claude Code\nSigned-off-by: Xe Iaso <xe@tigrisdata.com>", topic)
+	commitMsg := fmt.Sprintf("docs: %s\n\nAssisted-by: %s via Claude Code\nSigned-off-by: Xe Iaso <xe@tigrisdata.com>", topic, model)
 
-	// Commit
 	_, err = worktree.Commit(commitMsg, &git.CommitOptions{
 		Author: &object.Signature{
 			Name:  "Xe Iaso",
@@ -148,7 +208,7 @@ func main() {
 	}
 }
 
-func run(ctx context.Context) error {
+func run(_ context.Context) error {
 	var input Input
 
 	if err := json.NewDecoder(os.Stdin).Decode(&input); err != nil {
@@ -160,6 +220,12 @@ func run(ctx context.Context) error {
 	}
 
 	input.OutputFolder = *outputFolder
+
+	if info, err := os.Stat(*outputFolder); err != nil {
+		return fmt.Errorf("output folder %q: %w", *outputFolder, err)
+	} else if !info.IsDir() {
+		return fmt.Errorf("output folder %q is not a directory", *outputFolder)
+	}
 
 	var promptBuilder strings.Builder
 
@@ -184,7 +250,7 @@ func run(ctx context.Context) error {
 		AdditionalDirectories: []string{*outputFolder},
 		Verbose:               true,
 		WorkingDir:            *outputFolder,
-		Model:                 claudecode.Model("glm-4.7"),
+		Model:                 claudecode.Model(*anthropicModel),
 
 		MCPConfig: &claudecode.MCPConfig{
 			MCPServers: map[string]claudecode.MCPServer{
@@ -214,73 +280,11 @@ func run(ctx context.Context) error {
 		return fmt.Errorf("can't open Claude Code session: %w", err)
 	}
 
-	lg := slog.With()
+	lg := slog.With("session", sess.ID, "topic", input.Topic)
 	lg.Info("started agent")
 
 	for event := range sess.Events {
-		lg.Info("got event", "session", sess.ID, "type", event.Type, "subtype", event.Subtype, "is_error", event.IsError)
-		if event.IsError {
-			lg.Error("execution error", "err", event.Error)
-		}
-		if event.Message != nil {
-			for _, part := range event.Message.Content {
-				switch part.Type {
-				case "tool_use":
-					switch part.Name {
-					case "TodoWrite":
-						inputMap := make(map[string]any, len(part.Input))
-						for k, v := range part.Input {
-							inputMap[k] = v
-						}
-						if todoList, err := ParseTodoFromMap(inputMap); err == nil {
-							for _, todo := range todoList.Todos {
-								lg.Info("todo", "status", todo.Status, "content", todo.Content)
-							}
-						} else {
-							lg.Info("using tool", "tool", part.Name, "input", part.Input)
-						}
-					case "mcp__web-reader__webReader":
-						if url, ok := part.Input["url"].(string); ok {
-							lg.Info("fetching docs", "url", url)
-						} else {
-							lg.Info("using tool", "tool", part.Name, "input", part.Input)
-						}
-					case "Read":
-						if path, ok := part.Input["file_path"].(string); ok {
-							lg.Info("reading file", "path", path)
-						} else {
-							lg.Info("using tool", "tool", part.Name, "input", part.Input)
-						}
-					case "Write":
-						if path, ok := part.Input["file_path"].(string); ok {
-							lg.Info("writing file", "path", path)
-						} else {
-							lg.Info("using tool", "tool", part.Name, "input", part.Input)
-						}
-					case "Edit":
-						if path, ok := part.Input["file_path"].(string); ok {
-							lg.Info("editing file", "path", path)
-						} else {
-							lg.Info("using tool", "tool", part.Name, "input", part.Input)
-						}
-					case "Bash":
-						command, _ := part.Input["command"].(string)
-						description, _ := part.Input["description"].(string)
-						lg.Info("running command", "command", command, "description", description)
-					default:
-						lg.Info("using tool", "tool", part.Name, "input", part.Input)
-					}
-				case "tool_result":
-					lg.Info("tool result", "tool", part.Name)
-					json.NewEncoder(os.Stdout).Encode(part)
-					fmt.Println()
-				}
-				if part.Text != "" {
-					fmt.Printf("%s> %s\n", event.Message.Role, part.Text)
-				}
-				lg.Info("message type", "session", sess.ID, "type", event.Type, "subtype", event.Subtype, "message_type", part.Type)
-			}
-		}
+		handleEvent(lg, event)
 	}
 
 	result, err := sess.Wait()
@@ -288,15 +292,14 @@ func run(ctx context.Context) error {
 		return fmt.Errorf("can't get session result: %w", err)
 	}
 
+	lg.Info("got result", "type", result.Type, "subtype", result.Subtype, "cost_usd", result.CostUSD, "duration_ms", result.DurationMS, "num_turns", result.NumTurns)
+
 	if result.IsError {
-		lg.Error("got error result", "session", sess.ID, "type", result.Type, "subtype", result.Subtype, "cost_usd", result.CostUSD, "duration_ms", result.DurationMS, "num_turns", result.NumTurns, "err", result.Error)
 		return fmt.Errorf("got error from Claude: %s", result.Error)
-	} else {
-		lg.Info("got result", "session", sess.ID, "type", result.Type, "subtype", result.Subtype, "cost_usd", result.CostUSD, "duration_ms", result.DurationMS, "num_turns", result.NumTurns)
 	}
 
 	// Commit any changes made in the output folder
-	if err := commitChanges(*outputFolder, *outputFolder, input.Topic); err != nil {
+	if err := commitChanges(*outputFolder, *outputFolder, input.Topic, *anthropicModel); err != nil {
 		if errors.Is(err, ErrNoChangesToCommit) {
 			slog.Info("no changes to commit in output folder")
 		} else {
